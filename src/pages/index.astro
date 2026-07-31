@@ -32,6 +32,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       let next = 2;
       let loading = false;
 
+      // Fold/collapse toggle via event delegation
+      feed.addEventListener('click', (e) => {
+        const head = e.target.closest('.day-head, .group-head, .source-head');
+        if (!head) return;
+        const container = head.closest('.day, .group, .source');
+        if (container) container.classList.toggle('collapsed');
+      });
+
       if (sentinel) {
         const observer = new IntersectionObserver(
           async (entries) => {
@@ -136,6 +144,25 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         font-family: var(--mono);
         font-size: 1.1rem;
         font-variant-numeric: tabular-nums;
+        cursor: pointer;
+        user-select: none;
+      }
+      .day-head:hover {
+        color: var(--base00);
+      }
+      .day-head::before {
+        content: '▾';
+        display: inline-block;
+        margin-right: 0.35em;
+        transition: transform 0.15s;
+        font-size: 0.8em;
+        flex-shrink: 0;
+      }
+      .day.collapsed .day-head::before {
+        transform: rotate(-90deg);
+      }
+      .day.collapsed > .group {
+        display: none;
       }
       .day-count {
         color: var(--base1);
@@ -154,6 +181,24 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         font-weight: 700;
         letter-spacing: 0.1em;
         text-transform: uppercase;
+        cursor: pointer;
+        user-select: none;
+      }
+      .group-head:hover {
+        opacity: 0.75;
+      }
+      .group-head::before {
+        content: '▾';
+        display: inline-block;
+        margin-right: 0.35em;
+        transition: transform 0.15s;
+        font-size: 0.9em;
+      }
+      .group.collapsed .group-head::before {
+        transform: rotate(-90deg);
+      }
+      .group.collapsed > .source {
+        display: none;
       }
 
       .source {
@@ -167,6 +212,24 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         font-family: var(--mono);
         font-size: 0.8rem;
         font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+      }
+      .source-head:hover {
+        opacity: 0.75;
+      }
+      .source-head::before {
+        content: '▾';
+        display: inline-block;
+        margin-right: 0.35em;
+        transition: transform 0.15s;
+        font-size: 0.9em;
+      }
+      .source.collapsed .source-head::before {
+        transform: rotate(-90deg);
+      }
+      .source.collapsed > .item {
+        display: none;
       }
 
       .item {
