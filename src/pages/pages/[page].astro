@@ -1,0 +1,18 @@
+---
+import Day from '../../components/Day.astro';
+import { days } from '../../lib/items.js';
+
+// Rendered without <html>/<head> so the client can append it directly.
+export const partial = true;
+
+export function getStaticPaths() {
+  // Page N = the Nth date, newest first. Page 1 is server-rendered in index.
+  return days()
+    .slice(1)
+    .map((_, i) => ({ params: { page: String(i + 2) } }));
+}
+
+const date = days()[Number(Astro.params.page) - 1];
+---
+
+<Day date={date} />

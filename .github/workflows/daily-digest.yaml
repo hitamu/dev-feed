@@ -1,0 +1,90 @@
+name: Daily Digest Generator
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allows manual trigger
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  generate-digest:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      contents: write # Commit matcha.db (tracks seen articles)
+      pages: write # Deploy to GitHub Pages
+      id-token: write # Pages OIDC token
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Install matcha
+        run: |
+          go clean -modcache
+          GOPROXY=direct go install github.com/piqoni/matcha@main
+
+      - name: Generate daily digest
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # Inject OpenAI API key from secrets into config
+          sed -i "s|openai_api_key:.*|openai_api_key: $OPENAI_API_KEY|" matcha.config.yaml
+
+          matcha -c matcha.config.yaml
+
+      - name: Commit database
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          # Discard the API key injected into the config above.
+          git checkout -- matcha.config.yaml
+
+          git add matcha.db
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: daily digest $(date +'%Y-%m-%d')"
+            git push
+          fi
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # node:sqlite is available without a flag from Node 24.
+          node-version: '24'
+          cache: npm
+
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Build site
+        env:
+          SITE_URL: ${{ steps.pages.outputs.origin }}
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: |
+          npm ci
+          npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+      - name: Deploy to Pages
+        id: deploy
+        uses: actions/deploy-pages@v4

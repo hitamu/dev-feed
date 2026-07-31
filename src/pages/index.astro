@@ -1,0 +1,204 @@
+---
+import Day from '../components/Day.astro';
+import { days, totalItems } from '../lib/items.js';
+
+const dates = days();
+const total = dates.length;
+const count = totalItems();
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>devfeed</title>
+  </head>
+  <body>
+    <header>
+      <h1>devfeed</h1>
+      <p class="count">{count} bài · {total} ngày</p>
+    </header>
+
+    <main id="feed">
+      {dates[0] && <Day date={dates[0]} />}
+    </main>
+
+    {total > 1 && <div id="sentinel">Đang tải…</div>}
+
+    <script define:vars={{ total, base }}>
+      const feed = document.getElementById('feed');
+      const sentinel = document.getElementById('sentinel');
+      let next = 2;
+      let loading = false;
+
+      if (sentinel) {
+        const observer = new IntersectionObserver(
+          async (entries) => {
+            if (!entries[0].isIntersecting || loading) return;
+            loading = true;
+            try {
+              const res = await fetch(`${base}/pages/${next}.html`);
+              if (!res.ok) throw new Error(res.status);
+              feed.insertAdjacentHTML('beforeend', await res.text());
+              next++;
+            } catch {
+              observer.disconnect();
+              sentinel.textContent = 'Tải lỗi. Reload trang.';
+              return;
+            } finally {
+              loading = false;
+            }
+            if (next > total) {
+              observer.disconnect();
+              sentinel.remove();
+            } else {
+              // The sentinel may still be inside rootMargin after appending,
+              // which fires no new callback. Re-observe to force a fresh check.
+              observer.unobserve(sentinel);
+              observer.observe(sentinel);
+            }
+          },
+          { rootMargin: '600px' }
+        );
+        observer.observe(sentinel);
+      }
+    </script>
+
+    <style is:global>
+      /* Solarized Light */
+      :root {
+        --base3: #fdf6e3;
+        --base2: #eee8d5;
+        --base1: #93a1a1;
+        --base0: #839496;
+        --base00: #657b83;
+        --base01: #586e75;
+        --yellow: #b58900;
+        --orange: #cb4b16;
+        --blue: #268bd2;
+        --cyan: #2aa198;
+      }
+      :root {
+        /* Monospace for structure (dates, feeds), sans for prose. */
+        --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+          'Liberation Mono', monospace;
+        --sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+          'Helvetica Neue', sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        font-size: 18px;
+      }
+      body {
+        max-width: 48rem;
+        margin: 0 auto;
+        padding: 2.5rem 1.25rem 5rem;
+        background: var(--base3);
+        color: var(--base00);
+        font-family: var(--sans);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      header {
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--base1);
+      }
+      h1 {
+        margin: 0;
+        color: var(--base01);
+        font-family: var(--mono);
+        font-size: 1.35rem;
+        letter-spacing: -0.01em;
+      }
+      .count {
+        margin: 0.35rem 0 0;
+        color: var(--base1);
+        font-family: var(--mono);
+        font-size: 0.8rem;
+      }
+
+      .day {
+        margin-top: 3rem;
+      }
+      .day-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+        margin: 0;
+        padding-bottom: 0.45rem;
+        border-bottom: 1px solid var(--base1);
+        color: var(--base01);
+        font-family: var(--mono);
+        font-size: 1.1rem;
+        font-variant-numeric: tabular-nums;
+      }
+      .day-count {
+        color: var(--base1);
+        font-size: 0.75rem;
+        font-weight: 400;
+      }
+
+      .group {
+        margin-top: 2rem;
+      }
+      .group-head {
+        margin: 0;
+        color: var(--orange);
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .source {
+        margin-top: 1.25rem;
+        padding-left: 1rem;
+        border-left: 2px solid var(--base2);
+      }
+      .source-head {
+        margin: 0 0 0.5rem;
+        color: var(--cyan);
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .item {
+        padding: 0.5rem 0 0.7rem;
+      }
+      .item .title {
+        color: var(--blue);
+        font-size: 1.05rem;
+        font-weight: 500;
+        line-height: 1.5;
+        text-decoration: none;
+        text-underline-offset: 3px;
+      }
+      .item .title:hover {
+        text-decoration: underline;
+      }
+      .item .summary {
+        max-width: 68ch;
+        margin-top: 0.5rem;
+        color: var(--base00);
+        font-size: 0.95rem;
+        line-height: 1.75;
+        white-space: pre-line;
+      }
+
+      #sentinel {
+        padding: 2.5rem 0;
+        color: var(--base1);
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        text-align: center;
+      }
+    </style>
+  </body>
+</html>

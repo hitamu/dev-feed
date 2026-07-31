@@ -1,0 +1,42 @@
+---
+import { dayTree } from '../lib/items.js';
+
+const { date } = Astro.props;
+const groups = dayTree(date);
+const count = groups.reduce(
+  (n, g) => n + g.sources.reduce((m, s) => m + s.items.length, 0),
+  0
+);
+---
+
+<section class="day">
+  <h2 class="day-head">
+    {date}<span class="day-count">{count} bài</span>
+  </h2>
+
+  {
+    groups.map((group) => (
+      <div class="group">
+        <h3 class="group-head">{group.group}</h3>
+        {group.sources.map((source) => (
+          <div class="source">
+            <h4 class="source-head">{source.source}</h4>
+            {source.items.map((item) => (
+              <article class="item">
+                <a
+                  class="title"
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {item.title}
+                </a>
+                {item.summary && <div class="summary">{item.summary}</div>}
+              </article>
+            ))}
+          </div>
+        ))}
+      </div>
+    ))
+  }
+</section>
