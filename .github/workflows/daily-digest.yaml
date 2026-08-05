@@ -37,8 +37,7 @@ jobs:
 
       - name: Install matcha
         run: |
-          go clean -modcache
-          GOPROXY=direct go install github.com/piqoni/matcha@main
+          go install github.com/piqoni/matcha@main
 
       - name: Generate daily digest
         env:
