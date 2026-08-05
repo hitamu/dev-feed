@@ -24,7 +24,7 @@ sunrise_sunset: false
 database_file_path: ./matcha.db
 openai_api_key:
 openai_base_url: https://openrouter.ai/api/v1
-openai_model: inclusionai/ling-3.0-flash:free
+openai_model: qwen/qwen3.7-flash
 summary_prompt: |
   Extract the key points from the original content and MUST present them in Vietnamese using Trunk's writing style: clear, direct, factual, and concise. Decide dynamically how many key points are needed based on the content's length and complexity — for a short note: 1–3 points; for a typical article: 3–7 points; for long or technical pieces: include all distinct factual claims, steps, or results needed to understand the piece (do not exceed ~12 points). Output one idea per line as a short sentence or a single-line bullet (one idea = one line). Prioritize concrete facts, numbers, and evidence; when available, add a short parenthetical source or concrete detail. Keep IT terms in English. Use active voice and present tense. Do not add recommendations, marketing language, or speculative claims.
 summary_feeds:
