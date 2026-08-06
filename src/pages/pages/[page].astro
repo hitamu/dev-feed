@@ -12,7 +12,8 @@ export function getStaticPaths() {
     .map((_, i) => ({ params: { page: String(i + 2) } }));
 }
 
-const date = days()[Number(Astro.params.page) - 1];
+const pageN = Number(Astro.params.page);
+const date = days()[pageN - 1];
 ---
 
-<Day date={date} />
+<Day date={date} n={pageN} />

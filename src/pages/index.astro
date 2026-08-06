@@ -12,21 +12,34 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>devfeed</title>
+    <title>devfeed — nhật ký lập trình</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <header>
-      <h1>devfeed</h1>
+    <header class="masthead">
+      <p class="issue">{total} ngày · cập nhật hàng ngày</p>
+      <h1 data-text="devfeed">devfeed</h1>
       <p class="count">{count} bài · {total} ngày</p>
     </header>
 
     <main id="feed">
-      {dates[0] && <Day date={dates[0]} />}
+      {dates[0] && <Day date={dates[0]} n={1} />}
     </main>
 
     {total > 1 && <div id="sentinel">Đang tải…</div>}
 
+    <footer>devfeed · <span id="foot-year"></span> · nhật ký nguồn kỹ thuật</footer>
+
     <script define:vars={{ total, base }}>
+      document.getElementById('foot-year').textContent = String(
+        new Date().getFullYear()
+      );
+
       const feed = document.getElementById('feed');
       const sentinel = document.getElementById('sentinel');
       let next = 2;
@@ -74,28 +87,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     </script>
 
     <style is:global>
-      /* Solarized Light */
-      :root {
-        --base3: #fdf6e3;
-        --base2: #eee8d5;
-        --base1: #93a1a1;
-        --base0: #839496;
-        --base00: #657b83;
-        --base01: #586e75;
-        --yellow: #b58900;
-        --orange: #cb4b16;
-        --blue: #268bd2;
-        --cyan: #2aa198;
-      }
-      :root {
-        /* Monospace for structure (dates, feeds), sans for prose. */
-        --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
-          'Liberation Mono', monospace;
-        --sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
-          'Helvetica Neue', sans-serif;
-      }
+      @import url('../../tokens.css');
+
       * {
         box-sizing: border-box;
+      }
+      html,
+      body {
+        overflow-x: clip;
       }
       html {
         font-size: 18px;
@@ -103,59 +102,85 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       body {
         max-width: 48rem;
         margin: 0 auto;
-        padding: 2.5rem 1.25rem 5rem;
-        background: var(--base3);
-        color: var(--base00);
-        font-family: var(--sans);
+        padding: var(--space-xl) var(--space-md) var(--space-3xl);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        font-family: var(--font-body);
+        font-size: var(--text-md);
         line-height: 1.6;
         -webkit-font-smoothing: antialiased;
         text-rendering: optimizeLegibility;
       }
-      header {
-        padding-bottom: 1rem;
-        border-bottom: 2px solid var(--base1);
+
+      /* ——— Masthead — print, off-register ——— */
+      .masthead {
+        margin-bottom: var(--space-2xl);
+        padding: var(--space-sm) 0 var(--space-lg);
+        border-top: 3px solid var(--color-ink);
+        border-bottom: 1px solid var(--color-ink);
       }
-      h1 {
+      .issue {
+        margin: 0 0 var(--space-sm);
+        font-family: var(--font-display);
+        font-size: var(--text-sm);
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--color-ink-2);
+      }
+      .masthead h1 {
+        position: relative;
         margin: 0;
-        color: var(--base01);
-        font-family: var(--mono);
-        font-size: 1.35rem;
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: clamp(3rem, 11vw, 5.5rem);
+        line-height: 0.88;
         letter-spacing: -0.01em;
+        text-transform: uppercase;
+        color: var(--color-ink);
+      }
+      /* second pass, off-register — the rust ghost sits behind */
+      .masthead h1::before {
+        content: attr(data-text);
+        position: absolute;
+        left: 0.055em;
+        top: 0.035em;
+        color: var(--color-accent);
+        pointer-events: none;
       }
       .count {
-        margin: 0.35rem 0 0;
-        color: var(--base1);
-        font-family: var(--mono);
-        font-size: 0.8rem;
+        margin: var(--space-md) 0 0;
+        font-family: var(--font-display);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-ink-2);
       }
 
+      /* ——— Day section head — numbered + double rule ——— */
       .day {
-        margin-top: 3rem;
+        margin-top: var(--space-2xl);
       }
       .day-head {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
-        gap: 1rem;
-        margin: 0;
-        padding-bottom: 0.45rem;
-        border-bottom: 1px solid var(--base1);
-        color: var(--base01);
-        font-family: var(--mono);
-        font-size: 1.1rem;
-        font-variant-numeric: tabular-nums;
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+        margin: 0 0 var(--space-lg);
+        padding-bottom: var(--space-2xs);
+        border-bottom: 2px solid var(--color-ink);
+        box-shadow: 0 3px 0 0 var(--color-rule-strong);
         cursor: pointer;
         user-select: none;
       }
-      .day-head:hover {
-        color: var(--base00);
-      }
       .day-head::before {
         content: '▾';
-        display: inline-block;
-        margin-right: 0.35em;
-        transition: transform 0.15s;
-        font-size: 0.8em;
+        font-family: var(--font-display);
+        font-size: var(--text-md);
+        color: var(--color-ink-2);
+        transition: transform var(--dur-short) var(--ease-out);
         flex-shrink: 0;
       }
       .day.collapsed .day-head::before {
@@ -164,35 +189,59 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       .day.collapsed > .group {
         display: none;
       }
-      .day-count {
-        color: var(--base1);
-        font-size: 0.75rem;
-        font-weight: 400;
+      .day-title {
+        display: inline-flex;
+        align-items: baseline;
+        gap: var(--space-sm);
       }
-
-      .group {
-        margin-top: 2rem;
+      .day-no {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: var(--text-xl);
+        color: var(--color-accent);
       }
-      .group-head {
-        margin: 0;
-        color: var(--orange);
-        font-family: var(--mono);
-        font-size: 0.75rem;
+      .day-date {
+        font-family: var(--font-display);
         font-weight: 700;
+        font-size: clamp(var(--text-xl), 5vw, var(--text-2xl));
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+      .day-count {
+        margin-left: auto;
+        color: var(--color-ink-2);
+        font-family: var(--font-display);
+        font-size: var(--text-sm);
+        font-weight: 600;
         letter-spacing: 0.1em;
         text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      /* ——— Group — rust condensed caps kicker ——— */
+      .group {
+        margin-top: var(--space-xl);
+      }
+      .group-head {
+        margin: 0 0 var(--space-md);
+        padding-top: var(--space-2xs);
+        border-top: 1px solid var(--color-rule);
+        font-family: var(--font-display);
+        font-size: var(--text-md);
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--color-accent);
         cursor: pointer;
         user-select: none;
-      }
-      .group-head:hover {
-        opacity: 0.75;
       }
       .group-head::before {
         content: '▾';
         display: inline-block;
-        margin-right: 0.35em;
-        transition: transform 0.15s;
-        font-size: 0.9em;
+        margin-right: 0.5em;
+        font-size: 0.75em;
+        color: var(--color-ink-2);
+        transition: transform var(--dur-short) var(--ease-out);
       }
       .group.collapsed .group-head::before {
         transform: rotate(-90deg);
@@ -201,66 +250,106 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         display: none;
       }
 
+      /* ——— Source — umber serif byline ——— */
       .source {
-        margin-top: 1.25rem;
-        padding-left: 1rem;
-        border-left: 2px solid var(--base2);
+        margin-top: var(--space-lg);
+        margin-left: var(--space-md);
+        padding-left: var(--space-sm);
+        border-left: 2px solid var(--color-umber);
       }
       .source-head {
-        margin: 0 0 0.5rem;
-        color: var(--cyan);
-        font-family: var(--mono);
-        font-size: 0.8rem;
+        margin: 0 0 var(--space-xs);
+        font-family: var(--font-body);
+        font-size: var(--text-md);
         font-weight: 600;
+        color: var(--color-umber);
         cursor: pointer;
         user-select: none;
       }
-      .source-head:hover {
-        opacity: 0.75;
-      }
       .source-head::before {
-        content: '▾';
+        content: '·';
         display: inline-block;
-        margin-right: 0.35em;
-        transition: transform 0.15s;
-        font-size: 0.9em;
-      }
-      .source.collapsed .source-head::before {
-        transform: rotate(-90deg);
+        margin-right: 0.5em;
+        color: var(--color-ink-2);
+        font-weight: 800;
       }
       .source.collapsed > .item {
         display: none;
       }
 
+      /* ——— Items — ink content with rust rule ——— */
       .item {
-        padding: 0.5rem 0 0.7rem;
+        padding: var(--space-2xs) 0 var(--space-md);
       }
       .item .title {
-        color: var(--blue);
-        font-size: 1.05rem;
-        font-weight: 500;
-        line-height: 1.5;
+        color: var(--color-ink);
+        font-family: var(--font-body);
+        font-size: var(--text-lg);
+        font-weight: 600;
+        line-height: 1.4;
         text-decoration: none;
-        text-underline-offset: 3px;
+        overflow-wrap: break-word;
+        transition: color var(--dur-short) var(--ease-out);
+      }
+      .item .title::after {
+        content: ' →';
+        color: var(--color-accent);
+        font-weight: 700;
       }
       .item .title:hover {
+        color: var(--color-accent);
         text-decoration: underline;
+        text-decoration-color: var(--color-accent);
+        text-underline-offset: 4px;
       }
       .item .summary {
-        max-width: 68ch;
-        margin-top: 0.5rem;
-        color: var(--base00);
-        font-size: 0.95rem;
-        line-height: 1.75;
+        max-width: 60ch;
+        margin-top: var(--space-2xs);
+        color: var(--color-ink-2);
+        font-size: var(--text-md);
+        line-height: 1.6;
         white-space: pre-line;
       }
 
+      /* ——— Sentinel / colophon ——— */
       #sentinel {
-        padding: 2.5rem 0;
-        color: var(--base1);
-        font-family: var(--mono);
-        font-size: 0.8rem;
+        padding: var(--space-2xl) 0;
+        color: var(--color-ink-3);
+        font-family: var(--font-display);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
         text-align: center;
+      }
+      footer {
+        margin-top: var(--space-3xl);
+        padding-top: var(--space-sm);
+        border-top: 1px solid var(--color-ink);
+        color: var(--color-ink-3);
+        font-family: var(--font-display);
+        font-size: var(--text-xs);
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        text-align: center;
+      }
+
+      a:focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: 3px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .day-head::before,
+        .group-head::before,
+        .item .title {
+          transition: none;
+        }
+      }
+      @media (max-width: 400px) {
+        .day-title {
+          gap: var(--space-2xs);
+        }
       }
     </style>
   </body>
