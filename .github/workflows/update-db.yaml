@@ -2,7 +2,7 @@ name: Update RSS Database
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '30 23 * * *'
   workflow_dispatch: # Allows manual trigger
 
 concurrency:
