@@ -1,16 +1,6 @@
 markdown_dir_path: .
 feeds:
   - https://dev.to/feed
-  - https://www.reddit.com/r/SaaS/hot/.rss
-  - https://www.reddit.com/r/buildinpublic/hot/.rss
-  - https://www.reddit.com/r/GithubCopilot/hot/.rss
-  - https://www.reddit.com/r/ChatGPT/hot/.rss
-  - https://www.reddit.com/r/cursor/hot/.rss
-  - https://www.reddit.com/r/mcp/hot/.rss
-  - https://www.reddit.com/r/indiehackers/hot/.rss
-  - https://www.reddit.com/r/ExperiencedDevs/hot/.rss
-  - https://www.reddit.com/r/ClaudeCode/hot/.rss
-  - https://www.reddit.com/r/webdev/hot/.rss
 google_news_keywords:
 instapaper: false
 weather_latitude:
@@ -41,6 +31,10 @@ summary_feeds:
   - https://www.ctologic.pro/feed
   - https://www.developing.dev/feed
   - https://newsletter.betterstack.com/feed
+  - https://aiweekly.co/issues.rss
+  - https://huyenchip.com/feed.xml
+  - https://lobste.rs/rss
+  - https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml
   - https://www.opensourceprojects.dev/feed.xml
   - http://hnrss.org/best 30
   - https://waitbutwhy.com/feed
@@ -125,8 +119,3 @@ summary_feeds:
   - https://computer.rip/rss.xml
   - https://www.latent.space/feed
   - https://www.interconnects.ai/feed
-  - https://aiweekly.co/issues.rss
-  - https://huyenchip.com/feed.xml
-  - https://openai.com/blog/rss.xml
-  - https://lobste.rs/rss
-  - https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml
